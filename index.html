@@ -1,0 +1,1460 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ROHINDH_S :: root@fullstack-dev</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Bebas+Neue&family=Oxanium:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #060907;
+        --bg-alt: #0a100c;
+        --panel: #0d140f;
+        --line: #16261a;
+        --green: #39ff8a;
+        --green-dim: #1c9e57;
+        --cyan: #37e6e6;
+        --amber: #ffb63d;
+        --text: #cdeedd;
+        --text-dim: #6f8f7c;
+        --danger: #ff4d4d;
+        --mono: "JetBrains Mono", monospace;
+        --display: "Bebas Neue", sans-serif;
+        --tech: "Oxanium", sans-serif;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--mono);
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(57, 255, 138, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(57, 255, 138, 0.035) 1px, transparent 1px);
+        background-size: 34px 34px;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          rgba(0, 0, 0, 0.18) 0px,
+          rgba(0, 0, 0, 0.18) 1px,
+          transparent 2px,
+          transparent 3px
+        );
+        pointer-events: none;
+        z-index: 2;
+        opacity: 0.4;
+      }
+
+      ::selection {
+        background: var(--green);
+        color: #000;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      /* SCROLLBAR */
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg-alt);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--green-dim);
+        border: 2px solid var(--bg-alt);
+      }
+
+      /* ===================== BIOS BOOT SCREEN ===================== */
+      #bios {
+        position: fixed;
+        inset: 0;
+        background: #000;
+        color: var(--green);
+        font-family: var(--mono);
+        z-index: 9999;
+        padding: 26px 34px;
+        font-size: 13px;
+        line-height: 1.65;
+        overflow: hidden;
+        transition:
+          opacity 0.6s ease,
+          transform 0.6s ease;
+      }
+      #bios.hide {
+        opacity: 0;
+        transform: scale(1.02);
+        pointer-events: none;
+      }
+      #bios .bios-line {
+        opacity: 0;
+        white-space: pre-wrap;
+      }
+      #bios .bios-line.show {
+        opacity: 1;
+      }
+      #bios .ok {
+        color: var(--green);
+      }
+      #bios .warn {
+        color: var(--amber);
+      }
+      #bios .dim {
+        color: var(--text-dim);
+      }
+      #bios-bar-wrap {
+        margin-top: 16px;
+        border: 1px solid var(--green-dim);
+        width: min(420px, 80%);
+        height: 14px;
+        padding: 2px;
+        opacity: 0;
+      }
+      #bios-bar-wrap.show {
+        opacity: 1;
+      }
+      #bios-bar {
+        height: 100%;
+        width: 0%;
+        background: var(--green);
+        transition: width 1.6s linear;
+      }
+      #bios-skip {
+        position: absolute;
+        bottom: 22px;
+        right: 30px;
+        font-size: 11px;
+        color: var(--text-dim);
+        border: 1px solid var(--line);
+        padding: 6px 10px;
+        cursor: pointer;
+        background: transparent;
+        font-family: var(--mono);
+      }
+      #bios-skip:hover {
+        color: var(--green);
+        border-color: var(--green-dim);
+      }
+
+      /* ===================== NAVBAR ===================== */
+      #navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 500;
+        background: rgba(6, 9, 7, 0.88);
+        backdrop-filter: blur(6px);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 22px;
+        font-family: var(--tech);
+        opacity: 0;
+        transform: translateY(-100%);
+        transition:
+          opacity 0.6s ease,
+          transform 0.6s ease;
+      }
+      #navbar.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .nav-dots {
+        display: flex;
+        gap: 6px;
+      }
+      .nav-dots span {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .nav-dots span:nth-child(1) {
+        background: #ff5f57;
+      }
+      .nav-dots span:nth-child(2) {
+        background: var(--amber);
+      }
+      .nav-dots span:nth-child(3) {
+        background: var(--green);
+      }
+      .nav-title {
+        font-size: 13px;
+        letter-spacing: 1px;
+        color: var(--text-dim);
+      }
+      .nav-title b {
+        color: var(--green);
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 22px;
+        list-style: none;
+        font-size: 12.5px;
+        letter-spacing: 0.5px;
+      }
+      .nav-links a {
+        text-decoration: none;
+        color: var(--text-dim);
+        position: relative;
+        padding: 4px 0;
+        transition: color 0.25s;
+      }
+      .nav-links a::before {
+        content: "> ";
+        color: var(--green);
+        opacity: 0;
+        transition: opacity 0.25s;
+      }
+      .nav-links a:hover {
+        color: var(--green);
+      }
+      .nav-links a:hover::before {
+        opacity: 1;
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 11.5px;
+        color: var(--cyan);
+      }
+      #clock {
+        letter-spacing: 1px;
+      }
+      .status-pill {
+        border: 1px solid var(--green-dim);
+        color: var(--green);
+        padding: 3px 8px;
+        font-size: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        letter-spacing: 1px;
+      }
+      .status-pill i {
+        width: 6px;
+        height: 6px;
+        background: var(--green);
+        border-radius: 50%;
+        display: inline-block;
+        animation: blink 1.4s infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.2;
+        }
+      }
+
+      @media (max-width: 900px) {
+        .nav-links {
+          display: none;
+        }
+      }
+
+      /* ===================== LAYOUT / SECTIONS ===================== */
+      main {
+        position: relative;
+        z-index: 5;
+      }
+
+      section {
+        padding: 110px 8vw 90px;
+        max-width: 1300px;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      .section-label {
+        font-family: var(--tech);
+        color: var(--amber);
+        font-size: 12.5px;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .section-label::before {
+        content: "//";
+        color: var(--green-dim);
+      }
+      .section-label::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, var(--line), transparent);
+      }
+
+      .section-title {
+        font-family: var(--display);
+        font-size: clamp(34px, 5vw, 58px);
+        letter-spacing: 1.5px;
+        color: var(--text);
+        margin-bottom: 40px;
+        text-transform: uppercase;
+      }
+      .section-title span {
+        color: var(--green);
+      }
+
+      /* ===================== HERO ===================== */
+      #hero {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-top: 130px;
+      }
+
+      .hero-tag {
+        font-family: var(--mono);
+        color: var(--cyan);
+        font-size: 13px;
+        letter-spacing: 3px;
+        border: 1px solid var(--line);
+        display: inline-block;
+        padding: 5px 12px;
+        margin-bottom: 22px;
+        background: rgba(55, 230, 230, 0.04);
+      }
+      .hero-tag::before {
+        content: "root@rohindh:~$ ";
+        color: var(--text-dim);
+      }
+
+      .glitch-wrap {
+        position: relative;
+      }
+      .glitch {
+        font-family: var(--display);
+        font-size: clamp(58px, 11vw, 150px);
+        line-height: 0.95;
+        letter-spacing: 2px;
+        color: var(--text);
+        text-transform: uppercase;
+        position: relative;
+        text-shadow: 0 0 18px rgba(57, 255, 138, 0.25);
+      }
+      .glitch span.hl {
+        color: var(--green);
+      }
+      .glitch::before,
+      .glitch::after {
+        content: attr(data-text);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--bg);
+      }
+      .glitch::before {
+        color: var(--cyan);
+        left: 2px;
+        clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+        animation: glitch-anim-1 4.5s infinite linear alternate-reverse;
+      }
+      .glitch::after {
+        color: var(--danger);
+        left: -2px;
+        clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+        animation: glitch-anim-2 3.2s infinite linear alternate-reverse;
+      }
+      @keyframes glitch-anim-1 {
+        0% {
+          transform: translate(0, 0);
+        }
+        20% {
+          transform: translate(-3px, 1px);
+        }
+        40% {
+          transform: translate(3px, -1px);
+        }
+        60% {
+          transform: translate(-2px, 0);
+        }
+        80% {
+          transform: translate(2px, 1px);
+        }
+        100% {
+          transform: translate(0, 0);
+        }
+      }
+      @keyframes glitch-anim-2 {
+        0% {
+          transform: translate(0, 0);
+        }
+        25% {
+          transform: translate(2px, -1px);
+        }
+        50% {
+          transform: translate(-3px, 1px);
+        }
+        75% {
+          transform: translate(1px, 1px);
+        }
+        100% {
+          transform: translate(0, 0);
+        }
+      }
+
+      .hero-role {
+        font-family: var(--tech);
+        font-size: clamp(16px, 2.2vw, 26px);
+        color: var(--text-dim);
+        margin-top: 18px;
+        letter-spacing: 1px;
+      }
+      .hero-role b {
+        color: var(--amber);
+        font-weight: 600;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 50px;
+        margin-top: 52px;
+        align-items: start;
+      }
+      @media (max-width: 900px) {
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .hero-desc {
+        color: var(--text-dim);
+        font-size: 14.5px;
+        line-height: 1.9;
+        max-width: 520px;
+      }
+      .hero-desc b {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      .hero-btns {
+        display: flex;
+        gap: 16px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+      }
+      .btn {
+        font-family: var(--tech);
+        font-size: 12.5px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        padding: 12px 22px;
+        border: 1px solid var(--green);
+        color: var(--green);
+        text-decoration: none;
+        background: transparent;
+        cursor: pointer;
+        position: relative;
+        transition: 0.25s;
+      }
+      .btn:hover {
+        background: var(--green);
+        color: #03150a;
+        box-shadow: 0 0 24px rgba(57, 255, 138, 0.45);
+      }
+      .btn.alt {
+        border-color: var(--cyan);
+        color: var(--cyan);
+      }
+      .btn.alt:hover {
+        background: var(--cyan);
+        color: #031414;
+        box-shadow: 0 0 24px rgba(55, 230, 230, 0.45);
+      }
+
+      /* terminal window */
+      .term {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        box-shadow:
+          0 20px 60px rgba(0, 0, 0, 0.55),
+          0 0 0 1px rgba(57, 255, 138, 0.03);
+        overflow: hidden;
+      }
+      .term-head {
+        background: #0f1712;
+        padding: 9px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-bottom: 1px solid var(--line);
+      }
+      .term-head .dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+      }
+      .term-head .dot.r {
+        background: #ff5f57;
+      }
+      .term-head .dot.y {
+        background: var(--amber);
+      }
+      .term-head .dot.g {
+        background: var(--green);
+      }
+      .term-head span {
+        margin-left: auto;
+        font-size: 11px;
+        color: var(--text-dim);
+        font-family: var(--mono);
+      }
+      .term-body {
+        padding: 18px 18px 24px;
+        font-size: 13.5px;
+        min-height: 190px;
+      }
+      .term-line {
+        margin-bottom: 8px;
+        color: var(--text-dim);
+      }
+      .term-line .prompt {
+        color: var(--green);
+      }
+      .term-line .path {
+        color: var(--cyan);
+      }
+      #typed-out {
+        color: var(--text);
+        white-space: pre-wrap;
+      }
+      .cursor {
+        display: inline-block;
+        width: 8px;
+        background: var(--green);
+        animation: blink 0.9s infinite;
+        margin-left: 2px;
+      }
+
+      /* ===================== SKILLS ===================== */
+      .skills-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 18px;
+      }
+      .skill-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        padding: 22px 20px;
+        position: relative;
+        transition: 0.3s;
+        overflow: hidden;
+      }
+      .skill-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 3px;
+        height: 0;
+        background: var(--green);
+        transition: 0.3s;
+      }
+      .skill-card:hover {
+        border-color: var(--green-dim);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      }
+      .skill-card:hover::before {
+        height: 100%;
+      }
+      .skill-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+      .skill-title {
+        font-family: var(--tech);
+        font-size: 15px;
+        letter-spacing: 1px;
+        color: var(--text);
+      }
+      .skill-tag {
+        font-size: 10px;
+        color: var(--bg);
+        background: var(--amber);
+        padding: 2px 7px;
+        letter-spacing: 1px;
+        font-family: var(--mono);
+      }
+      .skill-list {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .skill-list li {
+        font-size: 12px;
+        color: var(--text-dim);
+        border: 1px solid var(--line);
+        padding: 5px 10px;
+        font-family: var(--mono);
+        position: relative;
+        padding-left: 16px;
+      }
+      .skill-list li::before {
+        content: "$";
+        color: var(--green);
+        position: absolute;
+        left: 6px;
+      }
+
+      /* ===================== TIMELINE ===================== */
+      .timeline {
+        position: relative;
+        padding-left: 34px;
+      }
+      .timeline::before {
+        content: "";
+        position: absolute;
+        left: 6px;
+        top: 6px;
+        bottom: 6px;
+        width: 2px;
+        background: linear-gradient(var(--green), var(--line));
+      }
+      .tl-item {
+        position: relative;
+        margin-bottom: 46px;
+      }
+      .tl-item:last-child {
+        margin-bottom: 0;
+      }
+      .tl-dot {
+        position: absolute;
+        left: -34px;
+        top: 4px;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background: var(--bg);
+        border: 2px solid var(--green);
+        box-shadow: 0 0 12px rgba(57, 255, 138, 0.6);
+      }
+      .tl-date {
+        font-family: var(--tech);
+        color: var(--amber);
+        font-size: 12px;
+        letter-spacing: 2px;
+        margin-bottom: 6px;
+      }
+      .tl-role {
+        font-family: var(--tech);
+        font-size: 19px;
+        color: var(--text);
+        margin-bottom: 4px;
+      }
+      .tl-org {
+        color: var(--cyan);
+        font-size: 13px;
+        margin-bottom: 12px;
+      }
+      .tl-list {
+        list-style: none;
+        color: var(--text-dim);
+        font-size: 13.5px;
+        line-height: 1.85;
+      }
+      .tl-list li {
+        position: relative;
+        padding-left: 18px;
+        margin-bottom: 5px;
+      }
+      .tl-list li::before {
+        content: ">";
+        color: var(--green-dim);
+        position: absolute;
+        left: 0;
+      }
+
+      .cert-box {
+        margin-top: 50px;
+        border: 1px dashed var(--line);
+        padding: 22px;
+        background: rgba(255, 182, 61, 0.02);
+      }
+      .cert-box .section-label {
+        margin-bottom: 16px;
+      }
+      .cert-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        font-size: 13px;
+        color: var(--text-dim);
+        padding: 8px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .cert-row:last-child {
+        border-bottom: none;
+      }
+      .cert-row b {
+        color: var(--text);
+        font-weight: 500;
+      }
+      .cert-row span {
+        color: var(--green);
+        font-family: var(--mono);
+      }
+
+      /* ===================== PROJECTS ===================== */
+      .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: 24px;
+      }
+      .proj-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        transition: 0.3s;
+      }
+      .proj-card:hover {
+        border-color: var(--cyan);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+        transform: translateY(-4px);
+      }
+      .proj-top {
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .proj-idx {
+        font-family: var(--tech);
+        color: var(--text-dim);
+        font-size: 12px;
+        letter-spacing: 1px;
+      }
+      .proj-status {
+        font-size: 10px;
+        color: var(--green);
+        border: 1px solid var(--green-dim);
+        padding: 2px 8px;
+        letter-spacing: 1px;
+      }
+      .proj-body {
+        padding: 20px 18px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .proj-title {
+        font-family: var(--tech);
+        font-size: 20px;
+        color: var(--text);
+        margin-bottom: 10px;
+      }
+      .proj-desc {
+        color: var(--text-dim);
+        font-size: 13px;
+        line-height: 1.75;
+        margin-bottom: 16px;
+        flex: 1;
+      }
+      .proj-stack {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-bottom: 6px;
+      }
+      .proj-stack span {
+        font-size: 10.5px;
+        color: var(--cyan);
+        border: 1px solid rgba(55, 230, 230, 0.25);
+        padding: 3px 8px;
+        font-family: var(--mono);
+      }
+
+      /* ===================== CONTACT / TERMINAL INPUT ===================== */
+      #contact-term {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      }
+      #contact-body {
+        padding: 20px 22px;
+        height: 340px;
+        overflow-y: auto;
+        font-size: 13.5px;
+      }
+      #contact-body .out-line {
+        margin-bottom: 6px;
+        white-space: pre-wrap;
+        line-height: 1.7;
+      }
+      #contact-body .out-line .p {
+        color: var(--green);
+      }
+      #contact-body .out-line .cmdtext {
+        color: var(--text);
+      }
+      #contact-body .out-line.reply {
+        color: var(--text-dim);
+      }
+      #contact-body .out-line.reply a {
+        color: var(--cyan);
+        text-decoration: none;
+        border-bottom: 1px dotted var(--cyan);
+      }
+      #contact-body .out-line.err {
+        color: var(--danger);
+      }
+      #contact-body .out-line.ok {
+        color: var(--green);
+      }
+      .input-row {
+        display: flex;
+        align-items: center;
+        padding: 0 22px 18px;
+        gap: 8px;
+      }
+      .input-row .p {
+        color: var(--green);
+        font-size: 13.5px;
+      }
+      .input-row input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--text);
+        font-family: var(--mono);
+        font-size: 13.5px;
+        caret-color: var(--green);
+      }
+      .contact-hint {
+        margin-top: 16px;
+        color: var(--text-dim);
+        font-size: 12px;
+      }
+      .contact-hint b {
+        color: var(--amber);
+      }
+
+      .direct-links {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-top: 26px;
+      }
+      .direct-links a {
+        text-decoration: none;
+        font-family: var(--tech);
+        font-size: 12px;
+        letter-spacing: 1px;
+        color: var(--text-dim);
+        border: 1px solid var(--line);
+        padding: 9px 16px;
+        transition: 0.25s;
+      }
+      .direct-links a:hover {
+        color: var(--green);
+        border-color: var(--green-dim);
+      }
+
+      footer {
+        text-align: center;
+        padding: 34px 20px;
+        color: var(--text-dim);
+        font-size: 11.5px;
+        border-top: 1px solid var(--line);
+        font-family: var(--mono);
+        position: relative;
+        z-index: 5;
+      }
+      footer b {
+        color: var(--green);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ===================== BIOS BOOT SCREEN ===================== -->
+    <div id="bios">
+      <div id="bios-lines"></div>
+      <div id="bios-bar-wrap"><div id="bios-bar"></div></div>
+      <button id="bios-skip" onclick="skipBoot()">SKIP [ESC]</button>
+    </div>
+
+    <!-- ===================== NAVBAR ===================== -->
+    <nav id="navbar">
+      <div class="nav-left">
+        <div class="nav-dots"><span></span><span></span><span></span></div>
+        <div class="nav-title">
+          /usr/bin/<b>rohindh</b> &mdash; portfolio.exe
+        </div>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#hero">home</a></li>
+        <li><a href="#skills">skills</a></li>
+        <li><a href="#experience">experience</a></li>
+        <li><a href="#projects">projects</a></li>
+        <li><a href="#contact">contact</a></li>
+      </ul>
+      <div class="nav-right">
+        <div class="status-pill"><i></i>ONLINE</div>
+        <div id="clock">00:00:00</div>
+      </div>
+    </nav>
+
+    <main>
+      <!-- ===================== HERO ===================== -->
+      <section id="hero">
+        <div class="hero-tag">whoami</div>
+        <div class="glitch-wrap">
+          <h1 class="glitch" data-text="ROHINDH S">
+            ROHINDH <span class="hl">S</span>
+          </h1>
+        </div>
+        <div class="hero-role">
+          Full Stack Developer &mdash; <b>Python / Django / React</b>
+        </div>
+
+        <div class="hero-grid">
+          <div>
+            <p class="hero-desc">
+              Enthusiastic and results-driven full stack developer with a strong
+              foundation in
+              <b>software engineering, database management</b> and building
+              end-to-end web applications[cite: 1, 2]. Proficient in
+              <b>Python, Django, React</b> and the JavaScript ecosystem, with
+              hands-on experience building responsive interfaces and robust
+              backend architectures[cite: 2]. Certified Full Stack professional
+              with corporate internship experience across version control
+              pipelines and dynamic data solutions[cite: 1, 2].
+            </p>
+            <div class="hero-btns">
+              <a href="#projects" class="btn">./view_projects</a>
+              <a href="#contact" class="btn alt">./make_contact</a>
+            </div>
+          </div>
+
+          <div class="term">
+            <div class="term-head">
+              <span class="dot r"></span><span class="dot y"></span
+              ><span class="dot g"></span>
+              <span>bash &mdash; 80x24</span>
+            </div>
+            <div class="term-body">
+              <div class="term-line">
+                <span class="prompt">rohindh@devbox</span>:<span class="path"
+                  >~</span
+                >$ cat intro.sh
+              </div>
+              <div id="typed-out"></div>
+              <span class="cursor" id="type-cursor"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== SKILLS ===================== -->
+      <section id="skills">
+        <div class="section-label">module_02</div>
+        <h2 class="section-title">Tech <span>Stack</span></h2>
+
+        <div class="skills-grid">
+          <div class="skill-card">
+            <div class="skill-head">
+              <span class="skill-title">Backend &amp; Database</span
+              ><span class="skill-tag">CORE</span>
+            </div>
+            <ul class="skill-list">
+              <li>Python</li>
+              <li>Core Java</li>
+              <li>MySQL</li>
+              <li>Django REST</li>
+            </ul>
+          </div>
+          <div class="skill-card">
+            <div class="skill-head">
+              <span class="skill-title">Web Frameworks</span
+              ><span class="skill-tag">STACK</span>
+            </div>
+            <ul class="skill-list">
+              <li>React.js</li>
+              <li>Django</li>
+            </ul>
+          </div>
+          <div class="skill-card">
+            <div class="skill-head">
+              <span class="skill-title">Frontend Technologies</span
+              ><span class="skill-tag">UI</span>
+            </div>
+            <ul class="skill-list">
+              <li>HTML5</li>
+              <li>CSS3</li>
+              <li>Tailwind CSS</li>
+              <li>JS Components</li>
+            </ul>
+          </div>
+          <div class="skill-card">
+            <div class="skill-head">
+              <span class="skill-title">Developer Tools</span
+              ><span class="skill-tag">OPS</span>
+            </div>
+            <ul class="skill-list">
+              <li>Git</li>
+              <li>GitHub</li>
+              <li>Git Bash</li>
+              <li>VS Code</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== EXPERIENCE ===================== -->
+      <section id="experience">
+        <div class="section-label">module_03</div>
+        <h2 class="section-title">Experience <span>Log</span></h2>
+
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-date">2025</div>
+            <div class="tl-role">Full Stack Web Developer Intern</div>
+            <div class="tl-org">Tap Academy</div>
+            <ul class="tl-list">
+              <li>
+                Collaborated on building responsive web application layers and
+                implementing client-side logic using modern frontend
+                technologies[cite: 2].
+              </li>
+              <li>
+                Assisted in developing structural data schemas and managing code
+                queries using relational database systems[cite: 2].
+              </li>
+              <li>
+                Participated in modular code structuring, system testing
+                parameters, and managing continuous deployment tasks.
+              </li>
+            </ul>
+          </div>
+
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-date">2021 &mdash; 2025</div>
+            <div class="tl-role">B.Tech, Information Technology</div>
+            <div class="tl-org">
+              Sri Ramakrishna Institute of Technology &mdash; CGPA 7.1 /
+              10.0[cite: 2]
+            </div>
+          </div>
+
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-date">2020 &mdash; 2021</div>
+            <div class="tl-role">Higher Secondary Course (HSC)</div>
+            <div class="tl-org">
+              Kurinji Higher Secondary School &mdash; 89% Aggregate[cite: 2]
+            </div>
+          </div>
+        </div>
+
+        <div class="cert-box">
+          <div class="section-label">certifications.log</div>
+          <div class="cert-row">
+            <b>Full Stack Web Development Certification</b><span>2025</span>
+          </div>
+          <div class="cert-row">
+            <b>Internet of Things Certification &mdash; NPTEL</b
+            ><span>2023</span>
+          </div>
+          <div class="cert-row">
+            <b>Business English Certificate</b><span>2022</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== PROJECTS ===================== -->
+      <section id="projects">
+        <div class="section-label">module_04</div>
+        <h2 class="section-title">Deployed <span>Projects</span></h2>
+
+        <div class="projects-grid">
+          <div class="proj-card">
+            <div class="proj-top">
+              <span class="proj-idx">PROJ/01</span
+              ><span class="proj-status">BUILT</span>
+            </div>
+            <div class="proj-body">
+              <div class="proj-title">Full-Stack Expense Tracker</div>
+              <p class="proj-desc">
+                Complete expense tracking app with an independent React frontend
+                and a Django REST backend. Session-based authentication for
+                multi-user registration, login and private dashboards, with
+                structured models to log, update, categorize and track daily
+                expenses[cite: 1].
+              </p>
+              <div class="proj-stack">
+                <span>React</span><span>Django</span><span>Python</span
+                ><span>SQLite</span><span>Git</span><span>Git Bash</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="proj-card">
+            <div class="proj-top">
+              <span class="proj-idx">PROJ/02</span
+              ><span class="proj-status">BUILT</span>
+            </div>
+            <div class="proj-body">
+              <div class="proj-title">Online Food Delivery Application</div>
+              <p class="proj-desc">
+                End-to-end full stack web app with modular backend logic,
+                persistent database layers and object-oriented
+                architecture[cite: 2]. Secure relational schema in MySQL
+                tracking user accounts, menu data and active transactions,
+                exposed via a Django/Python API[cite: 1, 2].
+              </p>
+              <div class="proj-stack">
+                <span>React</span><span>Django</span><span>Python</span
+                ><span>MySQL</span><span>Git</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="proj-card">
+            <div class="proj-top">
+              <span class="proj-idx">PROJ/03</span
+              ><span class="proj-status">BUILT</span>
+            </div>
+            <div class="proj-body">
+              <div class="proj-title">Classic Snake Game</div>
+              <p class="proj-desc">
+                Browser-based interactive game with a utility-first responsive
+                UI built in Tailwind CSS[cite: 2]. Automated gameplay logic
+                covering food consumption states, score tracking, high-score
+                memory and grid boundary collision detection[cite: 2].
+              </p>
+              <div class="proj-stack">
+                <span>JavaScript</span><span>HTML5</span
+                ><span>Tailwind CSS</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== CONTACT ===================== -->
+      <section id="contact">
+        <div class="section-label">module_05</div>
+        <h2 class="section-title">Open <span>Connection</span></h2>
+
+        <div id="contact-term">
+          <div class="term-head">
+            <span class="dot r"></span><span class="dot y"></span
+            ><span class="dot g"></span>
+            <span>contact_shell &mdash; connected</span>
+          </div>
+          <div id="contact-body"></div>
+          <div class="input-row">
+            <span class="p">guest@rohindh:~$</span>
+            <input
+              id="contact-input"
+              type="text"
+              autocomplete="off"
+              placeholder="type 'help' and press enter"
+            />
+          </div>
+        </div>
+        <p class="contact-hint">
+          Try commands: <b>help</b>, <b>email</b>, <b>phone</b>,
+          <b>linkedin</b>, <b>github</b>, <b>location</b>, <b>whoami</b>,
+          <b>clear</b>
+        </p>
+
+        <div class="direct-links">
+          <a href="mailto:rohindhshan@gmail.com">✉ rohindhshan@gmail.com</a>
+          <a href="tel:+917305733955">☎ +91 7305733955</a>
+          <a
+            href="https://www.linkedin.com/in/rohindh-shanmugavel-16ss?utm_source=share_via&utm_content=profile&utm_medium=member_android"
+            target="_blank"
+            >🔗 LinkedIn</a
+          >
+          <a href="http://github.com/RohindhShan" target="_blank">💻 GitHub</a>
+          <a href="#" onclick="return false;">📍 Namakkal, Tamil Nadu</a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      &lt; built by <b>ROHINDH S</b> // compiled on the terminal // 2026 &gt;
+    </footer>
+
+    <script>
+      /* ============ BIOS BOOT SEQUENCE ============ */
+      const biosScript = [
+        { t: "ROHINDH-OS BIOS v4.2.1", c: "ok" },
+        { t: "Copyright (C) 2026, Full Stack Systems Inc.", c: "dim" },
+        { t: "", c: "dim" },
+        { t: "CPU: Python/Django Core @ 3.4GHz.......... OK", c: "ok" },
+        { t: "MEM: React.js Runtime  [ 8192MB ]......... OK", c: "ok" },
+        { t: "DISK: MySQL Storage Array................. OK", c: "ok" },
+        { t: "NET: Git / GitHub Pipeline................ OK", c: "ok" },
+        { t: "", c: "dim" },
+        { t: "Detecting skillset modules...", c: "dim" },
+        { t: " > Python............ FOUND", c: "ok" },
+        { t: " > Django REST....... FOUND", c: "ok" },
+        { t: " > React.js.......... FOUND", c: "ok" },
+        { t: " > Core Java......... FOUND", c: "ok" },
+        { t: " > Tailwind CSS...... FOUND", c: "ok" },
+        { t: "", c: "dim" },
+        { t: "WARNING: Self-doubt.exe process terminated by user.", c: "warn" },
+        { t: "Loading candidate profile: ROHINDH_S.PROFILE ...", c: "dim" },
+      ];
+
+      const biosContainer = document.getElementById("bios-lines");
+      const biosEl = document.getElementById("bios");
+      const navbarEl = document.getElementById("navbar");
+      let bootDone = false;
+
+      function renderBios() {
+        let i = 0;
+        function next() {
+          if (i >= biosScript.length) {
+            const barWrap = document.getElementById("bios-bar-wrap");
+            barWrap.classList.add("show");
+            requestAnimationFrame(() => {
+              document.getElementById("bios-bar").style.width = "100%";
+            });
+            setTimeout(finishBoot, 1800);
+            return;
+          }
+          const line = biosScript[i];
+          const div = document.createElement("div");
+          div.className = "bios-line " + line.c;
+          div.textContent = line.t;
+          biosContainer.appendChild(div);
+          requestAnimationFrame(() => div.classList.add("show"));
+          i++;
+          setTimeout(next, 120);
+        }
+        next();
+      }
+
+      function finishBoot() {
+        if (bootDone) return;
+        bootDone = true;
+        biosEl.classList.add("hide");
+        navbarEl.classList.add("show");
+        setTimeout(() => {
+          biosEl.style.display = "none";
+          startTyping();
+        }, 650);
+      }
+
+      function skipBoot() {
+        finishBoot();
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") finishBoot();
+      });
+
+      renderBios();
+
+      /* ============ LIVE CLOCK ============ */
+      function updateClock() {
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, "0");
+        const mm = String(now.getMinutes()).padStart(2, "0");
+        const ss = String(now.getSeconds()).padStart(2, "0");
+        document.getElementById("clock").textContent = `${hh}:${mm}:${ss}`;
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      /* ============ HERO TYPING TERMINAL ============ */
+      const typedTarget = document.getElementById("typed-out");
+      const introText = `> Name: Rohindh S
+> Role: Full Stack Developer
+> Stack: Python | Django | React | MySQL
+> Status: Actively seeking opportunities
+> Mission: Build clean, working, end-to-end products.`;
+
+      function startTyping() {
+        let idx = 0;
+        function type() {
+          if (idx <= introText.length) {
+            typedTarget.textContent = introText.slice(0, idx);
+            idx++;
+            setTimeout(type, 18);
+          }
+        }
+        type();
+      }
+
+      /* ============ CONTACT TERMINAL ============ */
+      const contactBody = document.getElementById("contact-body");
+      const contactInput = document.getElementById("contact-input");
+
+      function printLine(html, cls) {
+        const div = document.createElement("div");
+        div.className = "out-line" + (cls ? " " + cls : "");
+        div.innerHTML = html;
+        contactBody.appendChild(div);
+        contactBody.scrollTop = contactBody.scrollHeight;
+      }
+
+      function bootContact() {
+        printLine(
+          '<span class="p">system</span> :: contact channel established.',
+          "ok",
+        );
+        printLine("type <b>help</b> to list available commands.", "reply");
+      }
+      bootContact();
+
+      const commands = {
+        help: () => {
+          printLine("available commands:", "reply");
+          printLine("  help       - list commands", "reply");
+          printLine("  whoami     - short bio", "reply");
+          printLine("  email      - get email address", "reply");
+          printLine("  phone      - get phone number", "reply");
+          printLine("  linkedin   - open LinkedIn profile", "reply");
+          printLine("  github     - open GitHub profile", "reply");
+          printLine("  location   - current location", "reply");
+          printLine("  clear      - clear the terminal", "reply");
+        },
+        whoami: () => {
+          printLine(
+            "Rohindh S &mdash; Full Stack Developer (Python / Django / React). B.Tech IT, 2025.[cite: 2]",
+            "reply",
+          );
+        },
+        email: () => {
+          printLine(
+            'email &rarr; <a href="mailto:rohindhshan@gmail.com">rohindhshan@gmail.com</a>',
+            "reply",
+          );
+        },
+        phone: () => {
+          printLine(
+            'phone &rarr; <a href="tel:+917305733955">+91 7305733955</a>',
+            "reply",
+          );
+        },
+        linkedin: () => {
+          printLine("opening LinkedIn profile...", "reply");
+          window.open(
+            "https://www.linkedin.com/in/rohindh-shanmugavel-16ss?utm_source=share_via&utm_content=profile&utm_medium=member_android",
+            "_blank",
+          );
+        },
+        github: () => {
+          printLine("opening GitHub profile...", "reply");
+          window.open("http://github.com/RohindhShan", "_blank");
+        },
+        location: () => {
+          printLine(
+            "location &rarr; Namakkal, Tamil Nadu, India[cite: 2]",
+            "reply",
+          );
+        },
+        clear: () => {
+          contactBody.innerHTML = "";
+          bootContact();
+        },
+      };
+
+      function handleCommand(raw) {
+        const cmd = raw.trim().toLowerCase();
+        printLine(
+          `<span class="p">guest@rohindh:~$</span> <span class="cmdtext">${escapeHtml(raw)}</span>`,
+        );
+        if (cmd === "") return;
+        if (commands[cmd]) {
+          commands[cmd]();
+        } else {
+          printLine(
+            `command not found: ${escapeHtml(cmd)} — type 'help'`,
+            "err",
+          );
+        }
+      }
+
+      function escapeHtml(str) {
+        return str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      contactInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          const val = contactInput.value;
+          contactInput.value = "";
+          handleCommand(val);
+        }
+      });
+
+      /* focus terminal input on click anywhere in contact-term */
+      document
+        .getElementById("contact-term")
+        .addEventListener("click", () => contactInput.focus());
+    </script>
+  </body>
+</html>
